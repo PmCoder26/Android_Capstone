@@ -34,7 +34,6 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import org.modelmapper.ModelMapper
 
 class MainActivity : ComponentActivity() {
 

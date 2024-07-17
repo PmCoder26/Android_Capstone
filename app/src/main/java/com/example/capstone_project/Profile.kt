@@ -135,7 +135,7 @@ fun Profile(){
                 modifier = Modifier.fillMaxWidth()
                     .padding(start = 20.dp, end = 20.dp),
                 shape = RoundedCornerShape(7.dp),
-                colors = ButtonDefaults.buttonColors(Color(0xFCFCD23B)),
+                colors = ButtonDefaults.buttonColors(Color(0xFFF5CF14)),
                 border = BorderStroke(1.dp, Color(0xFCC59D0D))
             ){
                 Text("Log out",

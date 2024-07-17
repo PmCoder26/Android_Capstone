@@ -67,7 +67,7 @@ fun OnBoarding(){
             Box(
                 modifier = Modifier.height(110.dp)
                     .fillMaxWidth()
-                    .background(Color(0xD5213820)),
+                    .background(Color(0xFF71807B)),
                 contentAlignment = Alignment.Center
             ){
                 Text("Let's get to know you",
@@ -162,7 +162,7 @@ fun OnBoarding(){
                 modifier = Modifier.fillMaxWidth()
                     .padding(start = 20.dp, end = 20.dp),
                 shape = RoundedCornerShape(7.dp),
-                colors = ButtonDefaults.buttonColors(Color(0xFCFCD23B)),
+                colors = ButtonDefaults.buttonColors(Color(0xFFF4CE14)),
                 border = BorderStroke(1.dp, Color(0xFCC59D0D))
             ){
                 Text("Register",
