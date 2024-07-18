@@ -1,5 +1,8 @@
 package com.example.capstone_project
 
+import android.app.Activity
+import android.content.Context.MODE_PRIVATE
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,22 +33,26 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 @Preview(showBackground = true)
 @Composable
-fun Profile(){
+fun Profile(navCon: NavHostController = rememberNavController(), activity: Activity? = null){
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .height(100.dp),
                 horizontalArrangement = Arrangement.Center
             ){
                 Icon(
                     painter = painterResource(id = R.drawable.logo),
                     contentDescription = "little lemon logo",
-                    modifier = Modifier.padding(top = 20.dp)
+                    modifier = Modifier
+                        .padding(top = 20.dp)
                         .height(45.dp)
                 )
             }
@@ -60,7 +67,8 @@ fun Profile(){
         ){
 
             Box(
-                modifier = Modifier.height(100.dp)
+                modifier = Modifier
+                    .height(100.dp)
                     .fillMaxWidth()
                     .padding(top = 20.dp),
                 contentAlignment = Alignment.CenterStart
@@ -80,18 +88,30 @@ fun Profile(){
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 Column(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(20.dp)
                         .size(300.dp),
                     verticalArrangement = Arrangement.SpaceBetween
                 ){
+
+                    val sharedPref = activity!!.getSharedPreferences("User", MODE_PRIVATE)
+                    val firstName = sharedPref.getString("firstName", "First name")
+                    val lastName = sharedPref.getString("lastName", "Last name")
+                    val email = sharedPref.getString("email", "Email")
+
+
                     Text("First name",
                         modifier = Modifier.padding(top = 15.dp)
                         )
-                    Text("FirstName",
-                        modifier = Modifier.fillMaxWidth()
+                    Text(firstName!!,
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .height(45.dp)
-                            .border(border = BorderStroke(1.dp, Color(0x6F717575)), shape = RoundedCornerShape(7.dp))
+                            .border(
+                                border = BorderStroke(1.dp, Color(0x6F717575)),
+                                shape = RoundedCornerShape(7.dp)
+                            )
                             .padding(start = 15.dp, top = 10.dp),
                         style = TextStyle(
                             fontSize = 18.sp,
@@ -101,10 +121,14 @@ fun Profile(){
                     Text("Last name",
                         modifier = Modifier.padding(top = 15.dp)
                     )
-                    Text("LastName",
-                        modifier = Modifier.fillMaxWidth()
+                    Text(lastName!!,
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .height(45.dp)
-                            .border(border = BorderStroke(1.dp, Color(0x6F717575)), shape = RoundedCornerShape(7.dp))
+                            .border(
+                                border = BorderStroke(1.dp, Color(0x6F717575)),
+                                shape = RoundedCornerShape(7.dp)
+                            )
                             .padding(start = 15.dp, top = 10.dp),
                         style = TextStyle(
                             fontSize = 18.sp,
@@ -114,10 +138,14 @@ fun Profile(){
                     Text("Email",
                         modifier = Modifier.padding(top = 15.dp)
                     )
-                    Text("Email",
-                        modifier = Modifier.fillMaxWidth()
+                    Text(email!!,
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .height(45.dp)
-                            .border(border = BorderStroke(1.dp, Color(0x6F717575)), shape = RoundedCornerShape(7.dp))
+                            .border(
+                                border = BorderStroke(1.dp, Color(0x6F717575)),
+                                shape = RoundedCornerShape(7.dp)
+                            )
                             .padding(start = 15.dp, top = 10.dp),
                         style = TextStyle(
                             fontSize = 18.sp,
@@ -130,9 +158,19 @@ fun Profile(){
 
             Button(
                 onClick = {
-
+                    try{
+                        val sharedPref = activity!!.getSharedPreferences("User", MODE_PRIVATE)
+                        val areCleared = sharedPref.edit().clear().commit()
+                        if(areCleared){
+                            Toast.makeText(activity.applicationContext, "Logged out successfully!", Toast.LENGTH_LONG).show()
+                            navCon.navigate("OnBoarding")
+                        }
+                    } catch(e: Exception){
+                        Toast.makeText(activity!!.applicationContext, e.message.toString(), Toast.LENGTH_LONG).show()
+                    }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(start = 20.dp, end = 20.dp),
                 shape = RoundedCornerShape(7.dp),
                 colors = ButtonDefaults.buttonColors(Color(0xFFF5CF14)),

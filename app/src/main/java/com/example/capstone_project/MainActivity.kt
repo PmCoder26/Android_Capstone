@@ -21,6 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon.Companion.Text
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.example.capstone_project.ui.theme.Capstone_ProjectTheme
 import com.google.gson.Gson
@@ -73,13 +77,30 @@ class MainActivity : ComponentActivity() {
                 storeMenuItems()
             } catch(e: Exception){
                 toast(e.message.toString())
-                println(e.message)
             }
         }
 
         setContent {
+            val navCon = rememberNavController()
+            
             Capstone_ProjectTheme {
-                MyContent()
+
+                NavHost(navController = navCon, startDestination = "MyContent"){
+                    composable("MyContent"){
+                        MyContent(navCon)
+                    }
+                    composable("Home"){
+                        val menuItems by viewModel.menuItems.collectAsState()
+                        Home(navCon, menuItems)
+                    }
+                    composable("Profile"){
+                        Profile(navCon, this@MainActivity)
+                    }
+                    composable("OnBoarding"){
+                        OnBoarding(navCon, this@MainActivity)
+                    }
+                }
+
             }
         }
     }
@@ -87,16 +108,16 @@ class MainActivity : ComponentActivity() {
 
     @Preview(showBackground = true)
     @Composable
-    fun MyContent(){
+    fun MyContent(navCon: NavHostController =  rememberNavController()){
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ){
-            val menuList by viewModel.menuItems.collectAsState()
-            LazyColumn(){
-                items(menuList){ menuItem ->
-                    Text(menuItem.title)
-                }
+            if(!getSharedPreferences("User", MODE_PRIVATE).contains("firstName")){
+                navCon.navigate("OnBoarding")
+            }
+            else{
+                navCon.navigate("Home")
             }
         }
     }
@@ -109,9 +130,7 @@ class MainActivity : ComponentActivity() {
         val responseBody = client.get(urlString = baseUrl).bodyAsText()
         val gson = Gson()
         apiResponse = gson.fromJson(responseBody, MenuNetworkdata::class.java)
-        if (apiResponse.menu.isNotEmpty()) {
-            toast("Menu items received by api calls!")
-        } else {
+        if (apiResponse.menu.isEmpty()) {
             toast("Failed to receive menu items!")
         }
     }

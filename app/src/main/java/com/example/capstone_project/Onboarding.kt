@@ -1,5 +1,8 @@
 package com.example.capstone_project
 
+import android.app.Activity
+import android.content.Context.MODE_PRIVATE
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -35,16 +38,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 
 @Preview(showBackground = true)
 @Composable
-fun OnBoarding(){
+fun OnBoarding(navCon: NavHostController = rememberNavController(), activity: Activity? = null){
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .height(100.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
@@ -52,7 +58,8 @@ fun OnBoarding(){
                 Icon(
                     painter = painterResource(id = R.drawable.logo),
                     contentDescription = "little lemon logo",
-                    modifier = Modifier.padding(10.dp)
+                    modifier = Modifier
+                        .padding(10.dp)
                         .height(45.dp)
                 )
             }
@@ -65,7 +72,8 @@ fun OnBoarding(){
             horizontalAlignment = Alignment.CenterHorizontally,
         ){
             Box(
-                modifier = Modifier.height(110.dp)
+                modifier = Modifier
+                    .height(110.dp)
                     .fillMaxWidth()
                     .background(Color(0xFF71807B)),
                 contentAlignment = Alignment.Center
@@ -80,7 +88,8 @@ fun OnBoarding(){
             }
 
             Box(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .height(120.dp),
                 contentAlignment = Alignment.CenterStart
             ){
@@ -112,7 +121,8 @@ fun OnBoarding(){
                     label = {
                         Text("First name")
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(start = 20.dp, end = 20.dp)
                 )
 
@@ -126,7 +136,8 @@ fun OnBoarding(){
                     label = {
                         Text("Last name")
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(start = 20.dp, end = 20.dp)
                 )
 
@@ -143,7 +154,8 @@ fun OnBoarding(){
                     textStyle = TextStyle(
                         color = Color.Black
                     ),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(start = 20.dp, end = 20.dp)
                 )
             }
@@ -153,13 +165,28 @@ fun OnBoarding(){
             Button(
                 onClick = {
                     if(areValidCred(firstName, lastName, email)){
+                        try {
+                            val sharedPref = activity!!.getSharedPreferences("User", MODE_PRIVATE)
+                            val areSaved = sharedPref.edit()
+                                .putString("firstName", firstName)
+                                .putString("lastName", lastName)
+                                .putString("email", email)
+                                .commit()
+                            if (areSaved) {
+                                Toast.makeText(activity.applicationContext, "User created successfully!", Toast.LENGTH_LONG).show()
+                                navCon.navigate("Home")
 
+                            }
+                        } catch (e: Exception){
+                            Toast.makeText(activity!!.applicationContext, e.message.toString(), Toast.LENGTH_LONG).show()
+                        }
                     }
                     else{
-
+                        Toast.makeText(activity!!.applicationContext, "Invalid credentials!", Toast.LENGTH_LONG).show()
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(start = 20.dp, end = 20.dp),
                 shape = RoundedCornerShape(7.dp),
                 colors = ButtonDefaults.buttonColors(Color(0xFFF4CE14)),

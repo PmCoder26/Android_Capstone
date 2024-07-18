@@ -4,6 +4,7 @@ import android.app.Activity
 import android.graphics.drawable.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -37,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -45,12 +49,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 
-//private val viewModel = MenuItemViewModel(null, null)
 
 @Preview(showBackground = true)
 @Composable
-fun Home(){
+fun Home(navCon: NavHostController = rememberNavController(), menu: List<MenuItem> = emptyList()){
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -80,6 +87,9 @@ fun Home(){
                     modifier = Modifier
                         .size(60.dp)
                         .align(Alignment.End)
+                        .clickable() {
+                            navCon.navigate("Profile")
+                        }
                 )
             }
         }
@@ -184,8 +194,10 @@ fun Home(){
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
 
-//                val meuItems by viewModel.menuItems.collectAsState()
                 val categories = listOf("Starters", "Mains", "Desserts", "Drinks")
+                var currentCategory by remember{
+                    mutableStateOf("Starters")
+                }
 
                 Text("ORDER FOR DELIVERY!",
                     style = TextStyle(
@@ -206,7 +218,7 @@ fun Home(){
                     items(categories){ category ->
                         Button(
                             onClick = {
-
+                                      currentCategory = category
                             },
                             modifier = Modifier.padding(10.dp),
                             colors = ButtonDefaults.buttonColors(Color(0x3271807B)),
@@ -221,14 +233,90 @@ fun Home(){
                     }
                 }
 
-            }
+                Divider(
+                    modifier = Modifier.padding(18.dp)
+                )
 
+                if(searchPhrase.isBlank()){
+                    val list = menu.filter{ menuItem ->
+                        menuItem.category.lowercase() == currentCategory.lowercase()
+                    }
+                    MenuItemsComposable(list)
+                }
+                else{
+                    val list = menu.filter{ menuItem ->
+                        menuItem.title.lowercase().contains(searchPhrase.lowercase())
+                    }
+                    MenuItemsComposable(list)
+                }
+            }
         }
     }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Preview(showBackground = true)
 @Composable
-fun MenuItemsComposable(menuItemList: List<MenuItem> = emptyList()){
+fun MenuItemsComposable(menuItemList: List<MenuItem> = emptyList<MenuItem>()){
 
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp, end = 20.dp),
+        verticalArrangement = Arrangement.Center,
+
+    ){
+        items(menuItemList){ menuItem ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ){
+                Column(){
+                    Text(menuItem.title,
+                        style = TextStyle(
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    )
+                    Text(menuItem.description,
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            color = Color(0xFF525A57)
+                        ),
+                        modifier = Modifier.width(220.dp)
+                    )
+                    Spacer(Modifier.height(7.dp))
+                    Text("$${menuItem.price}",
+                        style = TextStyle(
+                            fontSize = 18.sp,
+                            color = Color(0xFF525A57),
+                            fontWeight = FontWeight.Bold
+                        ),
+                    )
+                }
+
+                GlideImage(
+                    model = menuItem.image,
+                    contentDescription = "menu item image",
+                    modifier = Modifier
+                        .size(90.dp)
+                        .align(Alignment.Bottom),
+                    contentScale = ContentScale.Crop,
+                )
+            }
+            Divider(
+                modifier = Modifier.padding(top = 18.dp)
+            )
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
